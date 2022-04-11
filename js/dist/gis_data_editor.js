@@ -7,7 +7,7 @@
  *
  */
 
-/* global addZoomPanControllers, loadSVG, selectVisualization, styleOSM, zoomAndPan */
+/* global addZoomPanControllers, storeGisSvgRef, selectVisualization, styleOSM, zoomAndPan */
 // js/table/gis_visualization.js
 
 /* global themeImagePath */
@@ -62,12 +62,11 @@ function addDataPoint(pointNumber, prefix) {
 
 
 function initGISEditorVisualization() {
-  // Loads either SVG or OSM visualization based on the choice
+  storeGisSvgRef(); // Loads either SVG or OSM visualization based on the choice
+
   selectVisualization(); // Adds necessary styles to the div that contains the openStreetMap
 
-  styleOSM(); // Loads the SVG element and make a reference to it
-
-  loadSVG(); // Adds controllers for zooming and panning
+  styleOSM(); // Adds controllers for zooming and panning
 
   addZoomPanControllers();
   zoomAndPan();
@@ -88,7 +87,7 @@ function loadJSAndGISEditor(value, field, type, inputName) {
   var head = document.getElementsByTagName('head')[0];
   var script; // Loads a set of small JS file needed for the GIS editor
 
-  var smallScripts = ['js/vendor/jquery/jquery.svg.js', 'js/vendor/jquery/jquery.mousewheel.js', 'js/vendor/jquery/jquery.event.drag-2.2.js', 'js/dist/table/gis_visualization.js'];
+  var smallScripts = ['js/vendor/jquery/jquery.svg.js', 'js/vendor/jquery/jquery.mousewheel.js', 'js/dist/table/gis_visualization.js'];
 
   for (var i = 0; i < smallScripts.length; i++) {
     script = document.createElement('script');

@@ -65,6 +65,9 @@ DesignerMove.markUnsaved = function () {
   $('#saved_state').text('*');
 };
 
+var mainDirection = $('html').attr('dir') === 'rtl' ? 'right' : 'left'; // Will be used to multiply the offsetLeft by -1 if the direction is rtl.
+
+var directionEffect = mainDirection === 'right' ? -1 : 1;
 var curClick = null;
 var smS = 0;
 var smAdd = 10;
@@ -101,7 +104,9 @@ if (isIe) {
 }
 
 DesignerMove.mouseDown = function (e) {
-  globX = isIe ? e.clientX + document.body.scrollLeft : e.pageX;
+  // eslint-disable-next-line compat/compat
+  globX = isIe ? e.clientX + document.body.scrollLeft : e.pageX; // eslint-disable-next-line compat/compat
+
   globY = isIe ? e.clientY + document.body.scrollTop : e.pageY;
 
   if (e.target.tagName === 'SPAN') {
@@ -123,9 +128,11 @@ DesignerMove.mouseDown = function (e) {
 DesignerMove.mouseMove = function (e) {
   if (e.preventDefault) {
     e.preventDefault();
-  }
+  } // eslint-disable-next-line compat/compat
 
-  var newDx = isIe ? e.clientX + document.body.scrollLeft : e.pageX;
+
+  var newDx = isIe ? e.clientX + document.body.scrollLeft : e.pageX; // eslint-disable-next-line compat/compat
+
   var newDy = isIe ? e.clientY + document.body.scrollTop : e.pageY;
   var deltaX = globX - newDx;
   var deltaY = globY - newDy;
@@ -135,11 +142,11 @@ DesignerMove.mouseMove = function (e) {
   if (curClick !== null) {
     DesignerMove.markUnsaved();
     var $curClick = $(curClick);
-    var curX = parseFloat($curClick.attr('data-left') || $curClick.css('left'));
+    var curX = parseFloat($curClick.attr('data-' + mainDirection) || $curClick.css(mainDirection));
     var curY = parseFloat($curClick.attr('data-top') || $curClick.css('top'));
-    var newX = curX - deltaX;
+    var newX = curX - directionEffect * deltaX;
     var newY = curY - deltaY;
-    $curClick.attr('data-left', newX);
+    $curClick.attr('data-' + mainDirection, newX);
     $curClick.attr('data-top', newY);
 
     if (onGrid) {
@@ -153,7 +160,7 @@ DesignerMove.mouseMove = function (e) {
       newY = 0;
     }
 
-    $curClick.css('left', newX + 'px');
+    $curClick.css(mainDirection, newX + 'px');
     $curClick.css('top', newY + 'px');
   } else if (layerMenuCurClick) {
     if (menuMoved) {
@@ -161,7 +168,7 @@ DesignerMove.mouseMove = function (e) {
     }
 
     var $layerMenu = $('#layer_menu');
-    var newWidth = $layerMenu.width() + deltaX;
+    var newWidth = $layerMenu.width() + directionEffect * deltaX;
 
     if (newWidth < 150) {
       newWidth = 150;
@@ -273,7 +280,7 @@ DesignerMove.resizeOsnTab = function () {
   var maxY = 0;
 
   for (var key in jTabs) {
-    var kX = parseInt(document.getElementById(key).style.left, 10) + document.getElementById(key).offsetWidth;
+    var kX = parseInt(document.getElementById(key).style[mainDirection], 10) + document.getElementById(key).offsetWidth;
     var kY = parseInt(document.getElementById(key).style.top, 10) + document.getElementById(key).offsetHeight;
     maxX = maxX < kX ? kX : maxX;
     maxY = maxY < kY ? kY : maxY;
@@ -387,7 +394,7 @@ DesignerMove.reload = function () {
 
           var y2 = document.getElementById(contr[K][key][key2][key3][0]).offsetTop + rowOffsetTop + heightField;
           var osnTab = document.getElementById('osn_tab');
-          DesignerMove.line0(x1 + osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + osnTab.offsetLeft, y2 - osnTab.offsetTop, DesignerMove.getColorByTarget(contr[K][key][key2][key3][0] + '.' + contr[K][key][key2][key3][1]));
+          DesignerMove.line0(x1 + directionEffect * osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + directionEffect * osnTab.offsetLeft, y2 - osnTab.offsetTop, DesignerMove.getColorByTarget(contr[K][key][key2][key3][0] + '.' + contr[K][key][key2][key3][1]));
         }
       }
     }
@@ -1397,6 +1404,7 @@ DesignerMove.newRelation = function () {
       Functions.ajaxShowMessage(data.error, false);
     } else {
       Functions.ajaxRemoveMessage($msgbox);
+      Functions.ajaxShowMessage(data.message);
       DesignerMove.loadPage(selectedPage);
     }
   }); // end $.post()
@@ -1520,8 +1528,10 @@ DesignerMove.canvasClick = function (id, event) {
   var K;
   var key;
   var key2;
-  var key3;
-  var localX = isIe ? event.clientX + document.body.scrollLeft : event.pageX;
+  var key3; // eslint-disable-next-line compat/compat
+
+  var localX = isIe ? event.clientX + document.body.scrollLeft : event.pageX; // eslint-disable-next-line compat/compat
+
   var localY = isIe ? event.clientY + document.body.scrollTop : event.pageY;
   localX -= $('#osn_tab').offset().left;
   localY -= $('#osn_tab').offset().top;
@@ -1588,7 +1598,7 @@ DesignerMove.canvasClick = function (id, event) {
           var osnTab = document.getElementById('osn_tab');
 
           if (!selected && localX > x1 - 10 && localX < x1 + 10 && localY > y1 - 7 && localY < y1 + 7) {
-            DesignerMove.line0(x1 + osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + osnTab.offsetLeft, y2 - osnTab.offsetTop, 'rgba(255,0,0,1)');
+            DesignerMove.line0(x1 + directionEffect * osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + directionEffect * osnTab.offsetLeft, y2 - osnTab.offsetTop, 'rgba(255,0,0,1)');
             selected = 1;
             Key0 = contr[K][key][key2][key3][0];
             Key1 = contr[K][key][key2][key3][1];
@@ -1596,7 +1606,7 @@ DesignerMove.canvasClick = function (id, event) {
             Key3 = key3;
             Key = K;
           } else {
-            DesignerMove.line0(x1 + osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + osnTab.offsetLeft, y2 - osnTab.offsetTop, DesignerMove.getColorByTarget(contr[K][key][key2][key3][0] + '.' + contr[K][key][key2][key3][1]));
+            DesignerMove.line0(x1 + directionEffect * osnTab.offsetLeft, y1 - osnTab.offsetTop, x2 + directionEffect * osnTab.offsetLeft, y2 - osnTab.offsetTop, DesignerMove.getColorByTarget(contr[K][key][key2][key3][0] + '.' + contr[K][key][key2][key3][1]));
           }
         }
       }
@@ -1626,6 +1636,7 @@ DesignerMove.updRelation = function () {
       Functions.ajaxShowMessage(data.error, false);
     } else {
       Functions.ajaxRemoveMessage($msgbox);
+      Functions.ajaxShowMessage(data.message);
       DesignerMove.loadPage(selectedPage);
     }
   }); // end $.post()
@@ -1733,7 +1744,9 @@ DesignerMove.generalScroll = function () {
   // if (timeoutId)
   clearTimeout(timeoutId);
   timeoutId = setTimeout(function () {
-    document.getElementById('top_menu').style.left = document.body.scrollLeft + 'px';
+    // eslint-disable-next-line compat/compat
+    document.getElementById('top_menu').style.left = document.body.scrollLeft + 'px'; // eslint-disable-next-line compat/compat
+
     document.getElementById('top_menu').style.top = document.body.scrollTop + 'px';
   }, 200);
 }; // max/min all tables

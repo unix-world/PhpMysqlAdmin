@@ -1223,7 +1223,7 @@ AJAX.registerOnload('server/status/monitor.js', function () {
     destroyGrid();
     initGrid();
   }
-  /* Calculactes the dynamic chart size that depends on the column width */
+  /* Calculates the dynamic chart size that depends on the column width */
 
 
   function calculateChartSize() {
@@ -1424,7 +1424,8 @@ AJAX.registerOnload('server/status/monitor.js', function () {
         $('#selection_box').remove();
       }
 
-      var selectionBox = $('<div id="selection_box" >');
+      var selectionBox = $('<div id="selection_box" >'); // eslint-disable-next-line compat/compat
+
       $(document.body).append(selectionBox);
       selectionStartX = ev.pageX;
       selectionStartY = ev.pageY;
@@ -1467,7 +1468,8 @@ AJAX.registerOnload('server/status/monitor.js', function () {
     });
     $('#gridchart' + runtime.chartAI).on('jqplotMouseLeave', function () {
       drawTimeSpan = false;
-    });
+    }); // eslint-disable-next-line compat/compat
+
     $(document.body).on('mouseup', function () {
       if ($('#selection_box').length) {
         $('#selection_box').remove();
@@ -1816,7 +1818,7 @@ AJAX.registerOnload('server/status/monitor.js', function () {
       /* Add filter options if more than a bunch of rows there to filter */
 
       if (logData.numRows > 12) {
-        $('#logTable').prepend('<fieldset id="logDataFilter">' + '    <legend>' + Messages.strFiltersForLogTable + '</legend>' + '    <div class="formelement">' + '        <label for="filterQueryText">' + Messages.strFilterByWordRegexp + '</label>' + '        <input name="filterQueryText" type="text" id="filter_query_text">' + '    </div>' + (logData.numRows > 250 ? ' <div class="formelement"><button name="startFilterQueryText" id="startFilterQueryText">' + Messages.strFilter + '</button></div>' : '') + '    <div class="formelement">' + '       <input type="checkbox" id="noWHEREData" name="noWHEREData" value="1"> ' + '       <label for="noWHEREData"> ' + Messages.strIgnoreWhereAndGroup + '</label>' + '   </div' + '</fieldset>');
+        $('#logTable').prepend('<fieldset id="logDataFilter">' + '    <legend>' + Messages.strFiltersForLogTable + '</legend>' + '    <div class="formelement">' + '        <label for="filterQueryText">' + Messages.strFilterByWordRegexp + '</label>' + '        <input name="filterQueryText" type="text" id="filterQueryText">' + '    </div>' + (logData.numRows > 250 ? ' <div class="formelement"><button class="btn btn-secondary" name="startFilterQueryText" id="startFilterQueryText">' + Messages.strFilter + '</button></div>' : '') + '    <div class="formelement">' + '       <input type="checkbox" id="noWHEREData" name="noWHEREData" value="1"> ' + '       <label for="noWHEREData"> ' + Messages.strIgnoreWhereAndGroup + '</label>' + '   </div' + '</fieldset>');
         $('#noWHEREData').on('change', function () {
           filterQueries(true);
         });

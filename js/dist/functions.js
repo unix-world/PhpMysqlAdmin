@@ -1330,6 +1330,9 @@ Functions.insertQuery = function (queryType) {
           }
 
           $('#querymessage').html('');
+        },
+        error: function error() {
+          $('#querymessage').html('');
         }
       });
     }
@@ -2274,7 +2277,8 @@ Functions.documentationAdd = function ($elm, params) {
   var url = Functions.sprintf(decodeURIComponent(mysqlDocTemplate), params[0]);
 
   if (params.length > 1) {
-    url += '#' + params[1];
+    // The # needs to be escaped to be part of the destination URL
+    url += encodeURIComponent('#') + params[1];
   }
 
   var content = $elm.text();
@@ -2702,7 +2706,7 @@ $(function () {
       holdStarter = null;
     }, 250);
   });
-  $(document).on('mouseup', 'span.ajax_notification.dismissable', function () {
+  $(document).on('mouseup', 'span.ajax_notification.dismissable', function (event) {
     if (holdStarter && event.which === 1) {
       clearTimeout(holdStarter);
       Functions.ajaxRemoveMessage($(this));
@@ -3557,8 +3561,7 @@ AJAX.registerOnload('functions.js', function () {
 
 Functions.hideShowConnection = function ($engineSelector) {
   var $connection = $('.create_table_form input[name=connection]');
-  var index = $connection.parent('td').index();
-  var $labelTh = $connection.parents('tr').prev('tr').children('th').eq(index);
+  var $labelTh = $('.create_table_form #storage-engine-connection');
 
   if ($engineSelector.val() !== 'FEDERATED') {
     $connection.prop('disabled', true).parent('td').hide();
@@ -4197,6 +4200,7 @@ AJAX.registerOnload('functions.js', function () {
 
 Functions.mainMenuResizerCallback = function () {
   // 5 px margin for jumping menu in Chrome
+  // eslint-disable-next-line compat/compat
   return $(document.body).width() - 5;
 }; // This must be fired only once after the initial page load
 
@@ -4495,7 +4499,8 @@ Functions.initSlider = function () {
     $wrapper.toggle($this.is(':visible'));
     $('<a>', {
       href: '#' + this.id,
-      'class': 'ajax'
+      'class': 'ajax',
+      id: 'slide-handle'
     }).text($this.attr('title')).prepend($('<span>')).insertBefore($this).on('click', function () {
       var $wrapper = $this.closest('.slide-wrapper');
       var visible = $this.is(':visible');
@@ -4863,6 +4868,7 @@ Functions.createViewDialog = function ($this) {
       var $dialog = $('<div></div>').attr('id', 'createViewDialog').append(data.message).dialog({
         width: 600,
         minWidth: 400,
+        height: $(window).height(),
         modal: true,
         buttons: buttonOptions,
         title: Messages.strCreateView,
@@ -5387,7 +5393,7 @@ Functions.configSet = function (key, value) {
  * @param {boolean}    cached          Configuration type.
  * @param {Function}   successCallback  The callback to call after the value is received
  *
- * @return {object}                Configuration value.
+ * @return {void}
  */
 
 
@@ -5402,8 +5408,6 @@ Functions.configGet = function (key, cached, successCallback) {
 
 
   $.ajax({
-    // Value at false to be synchronous (then ignore the callback on success)
-    async: typeof successCallback === 'function',
     url: 'index.php?route=/config/get',
     type: 'POST',
     dataType: 'json',
@@ -5427,7 +5431,6 @@ Functions.configGet = function (key, cached, successCallback) {
       }
     }
   });
-  return JSON.parse(localStorage.getItem(key));
 };
 /**
  * Return POST data as stored by Generator::linkOrButton
